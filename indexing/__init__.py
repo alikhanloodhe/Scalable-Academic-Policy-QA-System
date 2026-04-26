@@ -13,5 +13,8 @@ Public re-exports (expand as steps complete)
 """
 
 from .minhash_lsh import MinHashLSHIndex
+from .tfidf import build_tfidf_index, retrieve_top_k, vectorize_query
+from .simhash import SimHashIndex
+from .pagerank import HandbookPageRank
 
-__all__ = ["MinHashLSHIndex"]
+__all__ = ["MinHashLSHIndex", "build_tfidf_index", "retrieve_top_k", "SimHashIndex", "vectorize_query", "HandbookPageRank"]
