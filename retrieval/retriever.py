@@ -32,7 +32,7 @@ class Retriever:
         # Build PageRank structural importance index
         self.pagerank = HandbookPageRank(chunks)
 
-    def retrieve(self, query: str, method: Method = "tfidf", k: int = 5) -> list[tuple[Chunk, float]]:
+    def retrieve(self, query: str, method: Method = "tfidf", k: int = 5, pagerank_boost: float = 0.02) -> list[tuple[Chunk, float]]:
         """
         Retrieve top-k chunks for a query using the specified method.
         
@@ -73,20 +73,20 @@ class Retriever:
         reranked = []
         for chunk, score in candidates:
             pr        = self.pagerank.get_score(chunk.chunk_id)
-            boost     = 1.0 + 0.02 * (pr * n)   # max ~2% for a highly referenced chunk
+            boost     = 1.0 + pagerank_boost * (pr * n)   # adjustable boost
             reranked.append((chunk, score * boost))
 
         reranked.sort(key=lambda x: x[1], reverse=True)
         return reranked
 
-    def retrieve_with_timing(self, query: str, method: Method = "tfidf", k: int = 5) -> dict:
+    def retrieve_with_timing(self, query: str, method: Method = "tfidf", k: int = 5, pagerank_boost: float = 0.02) -> dict:
         """
         Retrieve top-k chunks with performance metrics (time and memory).
         """
         import time
         import sys
         start = time.perf_counter()
-        results = self.retrieve(query, method=method, k=k)
+        results = self.retrieve(query, method=method, k=k, pagerank_boost=pagerank_boost)
         elapsed_ms = (time.perf_counter() - start) * 1000
         mem = sum(sys.getsizeof(chunk.text) + sys.getsizeof(score) for chunk, score in results)
         return {
@@ -95,13 +95,13 @@ class Retriever:
             "memory_bytes": mem,
         }
 
-    def retrieve_all(self, query: str, k: int = 5) -> dict[str, dict]:
+    def retrieve_all(self, query: str, k: int = 5, pagerank_boost: float = 0.02) -> dict[str, dict]:
         """
         Run all three retrieval methods and return results + performance data.
         """
         all_results = {}
         for method in ("tfidf", "minhash", "simhash"):
-            all_results[method] = self.retrieve_with_timing(query, method=method, k=k)
+            all_results[method] = self.retrieve_with_timing(query, method=method, k=k, pagerank_boost=pagerank_boost)
         return all_results
 
     @staticmethod

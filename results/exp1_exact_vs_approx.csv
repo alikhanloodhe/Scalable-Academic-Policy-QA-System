@@ -1,0 +1,4 @@
+method,precision_at_5,recall_at_5,latency_ms,memory_kb
+TFIDF,1.0000,1.0000,0.3224,1540.68
+MINHASH,0.4167,0.4167,0.2746,318.83
+SIMHASH,0.4667,0.4667,0.3983,3.01
