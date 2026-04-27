@@ -408,8 +408,13 @@ class MinHashLSHIndex:
             for cid in self._buckets.get(key, []):
                 candidate_ids.add(cid)
 
+        # Fallback for short queries: 
+        # LSH is designed for symmetric document-to-document similarity. A 10-word query 
+        # compared to a 500-word chunk has a mathematically tiny Jaccard similarity (e.g., 0.01), 
+        # which falls far below the LSH threshold (0.125). 
+        # If LSH yields no candidates, we fallback to evaluating all chunks.
         if not candidate_ids:
-            return []
+            candidate_ids = set(range(len(self.chunks)))
 
         # 3. Re-rank candidates by exact Jaccard
         scored: list[tuple["Chunk", float]] = []
