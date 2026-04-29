@@ -1,3 +1,7 @@
 .venv
 __pycache__
 .env
+
+# Ignore .pyc files, __pycache__ directories, and virtual environment directories
+*.pyc
+

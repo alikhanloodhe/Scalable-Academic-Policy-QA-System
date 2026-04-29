@@ -94,6 +94,7 @@ Chosen parameters:
 from __future__ import annotations
 
 import math
+import re
 import random
 import struct
 import hashlib
@@ -130,7 +131,8 @@ def make_shingles(text: str, k: int = 3) -> set[str]:
     set[str]
         Set of space-joined k-gram strings.  Empty when ``len(tokens) < k``.
     """
-    tokens = text.lower().split()
+    # Use regex tokenization (same as TF-IDF) to strip punctuation properly
+    tokens = re.findall(r"\b[a-zA-Z0-9']+\b", text.lower())
     if len(tokens) < k:
         return set()
     return {" ".join(tokens[i : i + k]) for i in range(len(tokens) - k + 1)}
